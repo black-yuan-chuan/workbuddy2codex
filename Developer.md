@@ -58,7 +58,10 @@ Codex 配置写入、进程管理与自检方法。面向需要修改、排查�
 | `src/panel.js` | `WebviewViewProvider`：把 snapshot 推给面板，接收按钮消息 |
 | `src/webview-html.js` | 生成内联 CSS/JS 的 HTML，带 CSP nonce |
 | `media/panel.js` | 面板渲染与 `postMessage` 命令 |
-| `media/panel.css` / `icon.svg` | 样式与活动栏图标 |
+| `media/panel.css` | 面板样式 |
+| `media/icon.svg` | 活动栏图标（单色，跟随主题 `currentColor`） |
+| `media/icon.png` | 扩展列表 / Marketplace 图标（128×128 RGBA） |
+| `dev/make-icon.mjs` | 由代码生成 `media/icon.png`，改设计只改这里 |
 | `proxy/proxy.mjs` | 本地代理服务：路由、协议翻译、上游调用、错误分类 |
 | `proxy/shared/*.mjs` | 凭据、at-rest 解密、模型目录、积分 |
 | `dev/check-package.mjs` | 打包前校验清单引用的文件都存在 |
@@ -443,6 +446,24 @@ curl http://127.0.0.1:8402/w2c/models     # 模型列表
    不是静默失败。
 3. 占用端口时手动跑 `node proxy/proxy.mjs` → 日志应只有一行
    `failed to start: port <p> already in use`，退出码 1。
+
+### 13.3 图标
+
+两个图标，用途不同，**不要混用**：
+
+| 文件 | 用在哪 | 要求 |
+|---|---|---|
+| `media/icon.svg` | 活动栏视图容器（`contributes.viewsContainers`） | 24×24、单色、用 `currentColor` 描边，VS Code 会按主题着色 |
+| `media/icon.png` | 扩展列表与 Marketplace 侧栏（`package.json` 根级 `icon`） | 128×128 RGBA PNG，自带底色，不做主题着色 |
+
+`media/icon.png` 由 `dev/make-icon.mjs` 生成（`npm run icon`），不手工维护：
+
+- 4× 超采样抗锯齿，`node:zlib` 直接压 IDAT，**零依赖**；
+- 图形是两块互锁圆环（WorkBuddy 与 Codex 通过本地代理连通），蓝紫渐变圆角底；
+- 断口由 `OVERLAP_MARGIN` 控制：环形压住的区域要留出足够宽度，否则缩到 16–24px 会糊成一团；
+- 改完务必用 16/24/48px 各看一眼，活动栏图标是 24px 附近最容易糊的尺寸。
+
+`dev/check-package.mjs` 会校验 `pkg.icon` 指向的文件确实存在，避免打出一个没有图标的包。
 
 ## 14. 打包与发布
 

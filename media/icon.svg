@@ -1,4 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-  <path d="M4 7.5h16M4 12h10M4 16.5h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <circle cx="18.5" cy="16.5" r="3" stroke="currentColor" stroke-width="1.8"/>
+  <!-- Two linked rings: WorkBuddy and Codex joined by this local proxy.
+       The lower-right ring is an open arc so the upper-left ring passes
+       through it, which still reads as interlocked at activity-bar size. -->
+  <circle cx="9" cy="9" r="4.6" stroke="currentColor" stroke-width="1.9"/>
+  <path d="M12.7 11.02A4.6 4.6 0 1 1 10.68 13.43" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
 </svg>

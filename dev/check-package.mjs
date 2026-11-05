@@ -23,6 +23,9 @@ for (const icon of pkg.contributes?.viewsContainers?.activitybar ?? []) {
   if (icon.icon) required.push(icon.icon);
 }
 
+// Marketplace / extension-list icon declared at the manifest root.
+if (pkg.icon) required.push(pkg.icon);
+
 const missing = required.filter((rel) => !existsSync(join(root, rel)));
 if (missing.length) {
   console.error("[check-package] missing files:\n" + missing.join("\n"));
