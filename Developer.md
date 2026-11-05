@@ -492,6 +492,21 @@ code --install-extension workbuddy2codex-<version>.vsix --force
 
 ## 16. 第三方与许可
 
-`proxy/shared/atrest.mjs`、`credential.mjs`、`credits.mjs`、`catalog.mjs` 的部分
-实现移植自 MIT 许可的 `dsh-workbuddy-connect`，署名与许可原文见
-`THIRD-PARTY-NOTICES.md`，分发时必须保留。本项目原创部分为 MIT（见 `LICENSE`）。
+**本项目没有第三方运行时依赖。** `package.json` 无 `dependencies`、无
+`peerDependencies`、无 `extensionDependencies`；`src/` 与 `proxy/` 只 import
+`node:*` 内置模块和 `vscode` API，运行时不下载、不启动、不 import 任何第三方项目。
+所以 `npm install` 并非必需，`.vsix` 自带全部文件。
+
+`proxy/shared/atrest.mjs`（WorkBuddy at-rest 凭据信封解密）、`credential.mjs`、
+`credits.mjs`、`catalog.mjs` 的思路参考了 MIT 许可的 `dsh-workbuddy-connect`，
+代码已按当前上游实测行为在本项目内重写；该仓库**无需安装或随包分发**，仅需保留
+署名与许可原文（见 `THIRD-PARTY-NOTICES.md`）。本项目原创部分为 MIT（见 `LICENSE`）。
+
+对照表（也可在 `THIRD-PARTY-NOTICES.md` 末尾查看）：
+
+| 组件 | 是否随包分发 | 是否必须安装 |
+|---|---|---|
+| 本项目代码 | 是 | — |
+| dsh-workbuddy-connect | 否（只有思路） | **否** |
+| WorkBuddy 桌面端 | 否 | 是（上游服务，用户自行安装并登录） |
+| Node.js | 否 | 推荐 18+（找不到时用 VS Code 自带运行时兜底） |

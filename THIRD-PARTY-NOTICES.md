@@ -1,24 +1,37 @@
 # Third-Party Notices
 
 This project is published under the MIT license (see `LICENSE`). This file lists
-third-party work that the local proxy runtime borrows from or interoperates with,
-and reproduces the license text that must travel with it.
+third-party work whose **ideas or formats** were studied, and reproduces the
+license text that must travel with redistributions.
+
+**Nothing listed here is a runtime dependency.** WorkBuddy2Codex ships every
+file it needs; it has no npm dependencies, no `extensionDependencies` and does
+not download, launch or import any third-party project. The entries below are
+attribution only - they must stay in this file, they do not have to be
+installed for the extension to work.
 
 ---
 
-## 1. dsh-workbuddy-connect (required)
+## 1. dsh-workbuddy-connect (attribution only - not a runtime dependency)
 
 - Project: <https://github.com/corrinehu/dsh-workbuddy-connect>
 - Author: Corrine Hu
 - License: MIT
 
-Parts of `proxy/shared/atrest.mjs` and `proxy/proxy.mjs` were adapted from this
-project: the WorkBuddy desktop at-rest credential format, the upstream endpoint
-shape, the client User-Agent style and several upstream quirk workarounds
-(stream-only upstream, `developer` to `system` rewriting, tool schema hardening).
+The approach used in `proxy/shared/atrest.mjs` (decrypting the WorkBuddy desktop
+at-rest credential envelope), the upstream endpoint shape, the client
+User-Agent style and several upstream quirk workarounds (stream-only upstream,
+`developer` to `system` rewriting, tool schema hardening) were **studied from**
+this project and reimplemented here against the live upstream.
 
-No source file from that project is redistributed here. Its MIT notice is
-reproduced below as required.
+What that means in practice:
+
+- No source file, package, binary or data file from that project is
+  redistributed, vendored or downloaded.
+- That project does **not** have to be installed, cloned or run. Deleting it
+  from your machine changes nothing about this extension.
+- Only the MIT attribution below must be kept, because the reimplementation
+  is derived from reading its code.
 
 ```
 MIT License
@@ -70,8 +83,8 @@ terms of service; evaluate that yourself before use.
 
 ## Summary
 
-| Component | Included here | Notice required |
-|---|---|---|
-| Original code (`src/`, `media/`, `proxy/`) | yes | MIT, (c) 2026 Black Yuan |
-| dsh-workbuddy-connect (adapted parts) | adapted only, no files | **yes** (MIT) |
-| WorkBuddy desktop client | no | not applicable |
+| Component | Included here | Needed to run | Notice required |
+|---|---|---|---|
+| Original code (`src/`, `media/`, `proxy/`) | yes | yes | MIT, (c) 2026 Black Yuan |
+| dsh-workbuddy-connect | no files, approach only | **no** | yes (MIT) |
+| WorkBuddy desktop client | no | yes (upstream service, user installs it) | not applicable |

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
- * WorkBuddy 桌面端「at-rest」加密凭据解密（移植自 dsh-connect-workbuddy 的 at-rest 模块）。
+ * WorkBuddy 桌面端「at-rest」加密凭据解密。
+ * 思路参考 dsh-workbuddy-connect 的 at-rest 模块（MIT），代码在本项目内重写；
+ * 该项目不是运行依赖，无需安装，详见 THIRD-PARTY-NOTICES.md。
  *
  * 新版桌面端（5.6.0 起）把 auth.accessToken / refreshToken 写成：
  *   { "$wbEncrypted": 1, "envelope": "<base64 of JSON envelope>" }

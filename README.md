@@ -38,7 +38,7 @@ WorkBuddy 账号  ──▶  WorkBuddy2Codex 插件（本地代理）  ──▶
 
 ### 方式一：安装 VSIX 安装包（推荐，普通用户用这个）
 
-1. 拿到 `workbuddy2codex-1.0.2.vsix` 文件：从项目的
+1. 拿到 `workbuddy2codex-1.0.3.vsix` 文件：从项目的
    [Releases 发布页](https://github.com/black-yuan-chuan/workbuddy2codex/releases)
    下载；如果发布页还没有对应版本，可以按 [`Developer.md`](Developer.md) 的
    「打包与发布」一节自己生成一个。
@@ -56,10 +56,10 @@ WorkBuddy 账号  ──▶  WorkBuddy2Codex 插件（本地代理）  ──▶
 版本替换；`--force` 表示覆盖已安装的旧版本）：
 
 ```powershell
-code --install-extension workbuddy2codex-1.0.2.vsix --force
+code --install-extension workbuddy2codex-1.0.3.vsix --force
 ```
 
-macOS / Linux 的终端里同样是这一条命令，把结尾的 `workbuddy2codex-1.0.2.vsix`
+macOS / Linux 的终端里同样是这一条命令，把结尾的 `workbuddy2codex-1.0.3.vsix`
 换成你的实际文件名即可。
 
 如果不想先 `cd` 到那个文件夹，也可以直接写完整路径，例如文件在「下载」文件夹：
@@ -67,13 +67,13 @@ macOS / Linux 的终端里同样是这一条命令，把结尾的 `workbuddy2cod
 Windows（PowerShell）：
 
 ```powershell
-code --install-extension "$env:USERPROFILE\Downloads\workbuddy2codex-1.0.2.vsix" --force
+code --install-extension "$env:USERPROFILE\Downloads\workbuddy2codex-1.0.3.vsix" --force
 ```
 
 macOS / Linux：
 
 ```bash
-code --install-extension "$HOME/Downloads/workbuddy2codex-1.0.2.vsix" --force
+code --install-extension "$HOME/Downloads/workbuddy2codex-1.0.3.vsix" --force
 ```
 
 （上面的「下载」文件夹是示例，换成文件实际所在位置即可。）
@@ -174,10 +174,12 @@ code --install-extension "$HOME/Downloads/workbuddy2codex-1.0.2.vsix" --force
 
 ## License
 
-原创部分：MIT，© 2026 Black Yuan，详见 `LICENSE`。
+MIT，© 2026 Black Yuan，详见 `LICENSE`。
 
-`proxy/` 中有部分实现移植自 MIT 许可的 `dsh-workbuddy-connect`，
-其署名与许可原文见 `THIRD-PARTY-NOTICES.md`，分发时必须保留。
+`proxy/shared/atrest.mjs` 参考了 MIT 许可的 `dsh-workbuddy-connect` 解密 WorkBuddy
+凭据的思路，代码是在本项目里重新实现的。**该项目不需要安装，也不是运行依赖**——
+本插件自带全部所需文件，装好即用。署名与许可原文见 `THIRD-PARTY-NOTICES.md`，
+分发时需保留。
 
 ## 给开发者
 

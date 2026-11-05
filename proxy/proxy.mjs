@@ -18,8 +18,9 @@
  *  - tool_choice accepts string values only
  *  - reasoning_effort must stay inside the values declared by the model catalog
  *
- * Credential decryption and catalog knowledge derive from the DSH plugin
- * dsh-workbuddy-connect; see THIRD-PARTY-NOTICES.md.
+ * The at-rest credential decryption and catalog handling here were written
+ * after studying dsh-workbuddy-connect (MIT); no file from that project is
+ * vendored and it is not needed at runtime. See THIRD-PARTY-NOTICES.md.
  */
 import { createServer } from "node:http";
 import { homedir, platform } from "node:os";
