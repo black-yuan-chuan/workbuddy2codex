@@ -458,12 +458,80 @@ curl http://127.0.0.1:8402/w2c/models     # 模型列表
 
 `media/icon.png` 由 `dev/make-icon.mjs` 生成（`npm run icon`），不手工维护：
 
-- 4× 超采样抗锯齿，`node:zlib` 直接压 IDAT，**零依赖**；
+- 8× 超采样抗锯齿，`node:zlib` 直接压 IDAT，**零依赖**；
 - 图形是两块互锁圆环（WorkBuddy 与 Codex 通过本地代理连通），蓝紫渐变圆角底；
 - 断口由 `OVERLAP_MARGIN` 控制：环形压住的区域要留出足够宽度，否则缩到 16–24px 会糊成一团；
 - 改完务必用 16/24/48px 各看一眼，活动栏图标是 24px 附近最容易糊的尺寸。
 
 `dev/check-package.mjs` 会校验 `pkg.icon` 指向的文件确实存在，避免打出一个没有图标的包。
+
+### 13.4 发布到 VS Code 市场
+
+发布动作只需要**一次性的账号准备** + 之后每次的 `vsce publish`。账号准备必须由
+仓库所有者本人完成，因为涉及 Microsoft 账号与私人访问令牌（PAT）。
+
+### 1. 创建发布者（Publisher）
+
+1. 用 Microsoft 账号登录 <https://marketplace.visualstudio.com/manage>；
+2. 首次进入会要求创建 publisher，填 ID（**必须**与 `package.json` 的
+   `publisher` 一致，当前为 `black-yuan`）、显示名和邮箱；
+3. 创建后该 ID 被永久占用，**不能改名**（改名等于发一个新扩展，装过的用户不会自动迁移）。
+
+### 2. 创建 PAT（个人访问令牌）
+
+1. 打开 <https://dev.azure.com>，登录后进入 **User settings → Personal access tokens**；
+2. **Organization 必须选 `All accessible organizations`**（选具体组织会 401）；
+3. Scopes 直接点 **Show all scopes**，勾选 **Marketplace → Manage**（只勾 Acquire 无法发布）；
+4. 设置有效期并复制令牌（只显示一次）。
+
+### 3. 发布
+
+```powershell
+npx @vscode/vsce login black-yuan     # 粘贴上一步的 PAT，会保存到本地
+npx @vscode/vsce publish              # 读取 package.json 的 version 直接上传
+```
+
+也可以不保存令牌、单次发布：
+
+```powershell
+npx @vscode/vsce publish -p <PAT>
+```
+
+发布成功后扩展地址为
+`https://marketplace.visualstudio.com/items?itemName=black-yuan.workbuddy2codex`，
+通常几分钟内可被搜索到。
+
+### 4. 发布前必须满足的约束
+
+| 约束 | 说明 |
+|---|---|
+| `version` 必须递增 | 市场不允许同版本覆盖；改动后先改版本再 publish |
+| `publisher` 必须已创建 | 否则报 `Publisher 'xxx' is not verified` / 403 |
+| PAT 作用域 | 必须是 Marketplace → Manage，且组织为 All accessible organizations |
+| `repository` 字段可用 | vsce 会把 README 里的相对链接重写成仓库地址，缺失时报错 |
+| `icon` 为 128×128 PNG | 市场侧栏图标；SVG 会被拒绝 |
+| README 与 LICENSE | README 是市场主页正文；缺 LICENSE 会有警告 |
+| 体积 | 市场单个包上限 50 MB，本包约 72 KB，远未触及 |
+
+### 5. 更新与撤回
+
+- 更新：改代码 → 提升 `package.json` 的 `version` → `vsce publish`；
+- 撤回：`npx @vscode/vsce unpublish black-yuan.workbuddy2codex`（会删除扩展及
+  其安装量统计，慎用）；
+- 只是不想让人装到某个版本，用 `vsce unpublish black-yuan.workbuddy2codex@1.0.3`
+  删除指定版本。
+
+### 6. 内容审查上的注意点
+
+本扩展会访问 WorkBuddy 的非官方接口，且代理进程常驻。提交审核时建议在市场
+描述里明确：
+
+- 只监听 `127.0.0.1`，不对外开放；
+- 凭据仅存本机，且有「移除 Codex 配置」可回滚；
+- 依赖用户已安装并登录的 WorkBuddy 桌面端（第三方闭源软件，非本扩展分发的）。
+
+因上述 ToS 风险，市场审核**可能**拒绝或后续下架此扩展；发布前应自行评估，
+GitHub 分发（当前方式）不受此限制。
 
 ## 14. 打包与发布
 

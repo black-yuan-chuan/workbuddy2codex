@@ -2,7 +2,7 @@
   "name": "workbuddy2codex",
   "displayName": "WorkBuddy2Codex",
   "description": "在 VS Code 内一键启停 WorkBuddy 本地代理，切换模型并实时查看剩余积分",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "black-yuan",
   "author": {
     "name": "Black Yuan"
@@ -21,7 +21,8 @@
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Machine Learning"
   ],
   "keywords": [
     "workbuddy",
