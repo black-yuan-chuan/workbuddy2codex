@@ -38,7 +38,10 @@ WorkBuddy 账号  ──▶  WorkBuddy2Codex 插件（本地代理）  ──▶
 
 ### 方式一：安装 VSIX 安装包（推荐，普通用户用这个）
 
-1. 拿到 `workbuddy2codex-1.0.1.vsix` 文件。
+1. 拿到 `workbuddy2codex-1.0.1.vsix` 文件：从项目的
+   [Releases 发布页](https://github.com/black-yuan-chuan/workbuddy2codex/releases)
+   下载；如果发布页还没有对应版本，可以按 [`Developer.md`](Developer.md) 的
+   「打包与发布」一节自己生成一个。
 2. 在 VS Code 里打开左侧「扩展」面板（四个小方块的图标）。
 3. 点扩展面板右上角的 **`...`** → **从 VSIX 安装…**（英文界面是 *Install from VSIX...*）。
 4. 选择刚才的 `.vsix` 文件，等右下角提示安装成功。
@@ -49,13 +52,33 @@ WorkBuddy 账号  ──▶  WorkBuddy2Codex 插件（本地代理）  ──▶
 
 ### 方式二：命令行安装
 
-如果你更习惯命令行，在终端里执行：
+先在**存放 `.vsix` 文件的那个文件夹**里打开终端，然后执行（文件名按你实际下载的
+版本替换；`--force` 表示覆盖已安装的旧版本）：
 
 ```powershell
-code --install-extension F:\workbuddy2codex\workbuddy2codex-1.0.1.vsix --force
+code --install-extension workbuddy2codex-1.0.1.vsix --force
 ```
 
-然后重载窗口。
+macOS / Linux 的终端里同样是这一条命令，把结尾的 `workbuddy2codex-1.0.1.vsix`
+换成你的实际文件名即可。
+
+如果不想先 `cd` 到那个文件夹，也可以直接写完整路径，例如文件在「下载」文件夹：
+
+Windows（PowerShell）：
+
+```powershell
+code --install-extension "$env:USERPROFILE\Downloads\workbuddy2codex-1.0.1.vsix" --force
+```
+
+macOS / Linux：
+
+```bash
+code --install-extension "$HOME/Downloads/workbuddy2codex-1.0.1.vsix" --force
+```
+
+（上面的「下载」文件夹是示例，换成文件实际所在位置即可。）
+
+最后在 VS Code 里重载窗口（`Ctrl+Shift+P` → `Reload Window`）。
 
 ### 升级 / 覆盖安装
 

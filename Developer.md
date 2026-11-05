@@ -396,7 +396,9 @@ pid = readPid(port)
 ### 13.1 在 VS Code 里调扩展
 
 ```powershell
-code F:\workbuddy2codex      # 用 VS Code 打开本项目
+git clone https://github.com/black-yuan-chuan/workbuddy2codex.git
+cd workbuddy2codex
+code .                       # 用 VS Code 打开本项目
 # 按 F5 → 启动扩展开发宿主（Extension Development Host）
 ```
 
