@@ -1,176 +1,145 @@
 # WorkBuddy2Codex
 
-在 VS Code 里使用你已经登录的 WorkBuddy 账号里的模型，并把它们接进 Codex。
+把你在 **WorkBuddy（国内版）** 里已经登录、可以用的 AI 模型，接到 VS Code 的
+**Codex** 里使用。装好之后，侧边栏点几下就能开始用，不需要懂编程，也不需要
+申请 API Key。
 
-扩展在本地拉起一个零依赖的代理进程，把 WorkBuddy（国内版）已登录账号的模型
-以 OpenAI 兼容接口暴露给 Codex；侧边栏负责启停、切换模型、查看剩余积分并写入
-Codex 配置。整个过程无需申请 API Key，也不需要保持 WorkBuddy 桌面端运行。
+简单说：WorkBuddy 负责提供模型和积分，Codex 负责写代码，这个插件在中间
+"接线"，并帮你把两边的配置改好。
 
 ```
-VS Code 侧边栏  ──启动/停止──▶  proxy/proxy.mjs  ──▶  WorkBuddy 上游
-      │                              ▲
-      └──写入 config.toml + catalog──┘          Codex ──/v1/responses──▶ 本地代理
+WorkBuddy 账号  ──▶  WorkBuddy2Codex 插件（本地代理）  ──▶  Codex
+                        ▲
+                        └── 侧边栏：启动 / 切换模型 / 看剩余积分
 ```
 
-## 功能
+## 它能做什么
 
-- **一键启停**：侧边栏按钮或命令面板启动 / 停止 / 重启代理，不用开终端。
-- **模型切换**：下拉框选模型，自动写入 Codex 的 `config.toml` 与模型目录。
-- **剩余积分**：状态栏与面板实时显示 WorkBuddy 剩余积分及分包明细。
-- **零配置凭据**：直接复用 WorkBuddy 桌面端已登录的凭据，过期前自动刷新。
-- **零 npm 依赖**：只用 Node 内置模块与 `vscode` API。
+- **一键启停**：侧边栏的「启动」「停止」「重启」按钮，不用敲命令。
+- **切换模型**：下拉框选一个模型，插件自动写好 Codex 的配置。
+- **看剩余积分**：状态栏和面板实时显示 WorkBuddy 剩余积分和每个积分包的明细。
+- **不用再登录一次**：直接复用 WorkBuddy 桌面端已有的登录状态，过期前自动续期。
+- **装完即用**：不依赖额外的程序包，安装过程不会往你电脑里塞一堆东西。
 
-> 仅支持 WorkBuddy **国内版**（`copilot.tencent.com` / `codebuddy.cn`）。
+> 只支持 **WorkBuddy 国内版**。WorkBuddy 国际版/其他产品不适用。
 
-## 环境要求
+## 使用前需要准备什么
 
-- VS Code 1.85 或更高版本
-- Node.js 18 或更高版本（扩展会优先使用设置里指定的 node，其次是 PATH）
-- 本机已安装并登录 WorkBuddy 桌面端
+| 需要 | 说明 |
+|---|---|
+| VS Code | 1.85 或更高版本（帮助 → 关于 可看版本） |
+| Node.js | 18 或更高版本。安装 Node.js 时用默认选项即可；插件找不到时会退而使用 VS Code 自带的运行时 |
+| WorkBuddy 桌面端 | 已安装，并且**已经登录**过账号（登录一次就行，之后插件会自己续期） |
+| Codex | VS Code 里的 Codex 扩展（需要用它来写代码） |
+
+装好并登录 WorkBuddy 之后，WorkBuddy 本身**不需要一直开着**。
 
 ## 安装
 
-### 从 VSIX 安装
+### 方式一：安装 VSIX 安装包（推荐，普通用户用这个）
+
+1. 拿到 `workbuddy2codex-1.0.1.vsix` 文件。
+2. 在 VS Code 里打开左侧「扩展」面板（四个小方块的图标）。
+3. 点扩展面板右上角的 **`...`** → **从 VSIX 安装…**（英文界面是 *Install from VSIX...*）。
+4. 选择刚才的 `.vsix` 文件，等右下角提示安装成功。
+5. 按 `Ctrl+Shift+P`，输入 `Reload Window` 并回车，重载一次窗口。
+   （也可以直接关掉 VS Code 再打开。）
+
+装好之后，左侧活动栏会多出一个 **WorkBuddy2Codex** 图标。
+
+### 方式二：命令行安装
+
+如果你更习惯命令行，在终端里执行：
 
 ```powershell
-npx @vscode/vsce package --no-dependencies
-code --install-extension workbuddy2codex-1.0.1.vsix
+code --install-extension F:\workbuddy2codex\workbuddy2codex-1.0.1.vsix --force
 ```
 
-### 从源码调试
+然后重载窗口。
 
-```powershell
-code F:\workbuddy2codex      # 打开本项目
-# 按 F5 启动扩展开发宿主
-```
+### 升级 / 覆盖安装
 
-也可以执行 `Developer: Install Extension from Location...` 并选择本项目根目录。
+用新版本的 `.vsix` 重复上面的步骤即可，会自动覆盖旧版本（旧版本目录会被
+标记为弃用，重载后清理）。装完记得重载窗口，版本号才会更新。
 
-本项目不是 npm workspace，所有依赖都是 Node 内置模块，**不需要** `npm install`。
-打包时请带上 `--no-dependencies`。
+## 第一次使用
 
-## 使用
+1. 点左侧活动栏的 **WorkBuddy2Codex** 图标，打开面板。
+2. 点 **启动**。如果一切正常，状态会变成「运行中」，并显示剩余积分。
+   - 第一次启动需要几十秒读取 WorkBuddy 的登录信息，属于正常现象。
+3. 在「模型」下拉框里选一个你想用的模型。
+4. 点 **写入 Codex**。插件会把配置写进 Codex 的设置文件
+   （写入前会自动备份原文件，随时可以还原）。
+5. **新开一个 Codex 会话**（或重启 Codex 扩展）。之后在 Codex 里就能用了。
 
-1. 打开活动栏的 **WorkBuddy2Codex** 图标。
-2. 点 **启动**。首次启动会读取 WorkBuddy 桌面端的登录凭据，之后在后台自动刷新，
-   并把刷新结果缓存到 `~\.workbuddy2codex\auth.json`。**WorkBuddy 不需要保持运行。**
-3. 在面板里选择模型，或执行命令 `WorkBuddy2Codex: 切换模型`。
-4. 点 **写入 Codex**，扩展会把 provider 与模型目录写进 `~\.codex\config.toml`
-   （写入前自动备份为 `config.toml.bak-w2c-<时间戳>`）。
-5. **新开一个 Codex 会话**（或重启 Codex 扩展）使配置生效。
+> 切换模型后，已经打开的 Codex 会话不会立刻变，需要新开会话才生效。
 
-> 切换模型不做热加载：已经打开的 Codex 会话仍用旧模型，新会话才读取新配置。
+### 面板上各部分的含义
 
-## 命令
-
-| 命令 | 说明 |
+| 位置 | 含义 |
 |---|---|
-| `WorkBuddy2Codex: 启动代理` | 拉起本地代理并等待健康检查通过 |
-| `WorkBuddy2Codex: 停止代理` | 停止代理进程 |
-| `WorkBuddy2Codex: 重启代理` | 停止后重新启动 |
-| `WorkBuddy2Codex: 切换模型` | QuickPick 选模型并写入 Codex 配置 |
-| `WorkBuddy2Codex: 刷新剩余积分` | 立即查询一次积分 |
-| `WorkBuddy2Codex: 写入 Codex 配置` | 写入 provider + catalog + 当前模型 |
-| `WorkBuddy2Codex: 移除 Codex 配置` | 移除托管内容（先备份，可回滚） |
-| `WorkBuddy2Codex: 打开 Codex 配置文件` | 在编辑器里打开 `config.toml` 核对 |
+| 顶部状态圆点 | 绿色=代理正在运行；灰色=未启动；橙色=正在启动/停止 |
+| 剩余积分 | 你在 WorkBuddy 的可用积分；点「刷新」可立刻查询 |
+| 模型 | 下拉框选模型；右侧「打开配置」用于查看 Codex 配置文件 |
+| 日志 | 出问题时展开，最后几行通常能说明原因 |
 
-## 设置
+### 命令面板里的命令
 
-| 配置项 | 默认值 | 说明 |
+按 `Ctrl+Shift+P`，输入 `WorkBuddy2Codex` 可以看到全部命令：
+
+| 命令 | 作用 |
+|---|---|
+| 启动代理 | 启动本地代理 |
+| 停止代理 | 停止本地代理 |
+| 重启代理 | 先停止再启动（配置改了或状态异常时用） |
+| 切换模型 | 弹窗选模型并写入 Codex 配置 |
+| 刷新剩余积分 | 立刻查一次积分 |
+| 写入 Codex 配置 | 把模型、连接地址写进 Codex |
+| 移除 Codex 配置 | 撤销插件对 Codex 配置的修改（先备份，可还原） |
+| 打开 Codex 配置文件 | 用编辑器打开 Codex 的配置文件核对 |
+
+## 设置（一般不用改）
+
+在 VS Code 设置里搜索 `workbuddy2codex` 可以看到以下几项：
+
+| 设置项 | 默认值 | 作用 |
 |---|---|---|
-| `workbuddy2codex.port` | `8401` | 本地代理端口，Codex 的 `base_url` 使用它 |
-| `workbuddy2codex.autoStart` | `true` | VS Code 启动时自动拉起代理 |
-| `workbuddy2codex.nodePath` | 空 | 指定 node；留空自动查找 PATH / 常见安装目录 |
-| `workbuddy2codex.codexConfigPath` | 空 | 留空使用 `~/.codex/config.toml`（或 `CODEX_HOME`） |
-| `workbuddy2codex.creditsRefreshSeconds` | `60` | 积分刷新间隔（最小 15 秒） |
-| `workbuddy2codex.proxyPath` | 空 | 高级：自定义 `proxy/proxy.mjs` 路径 |
+| `port` | 8401 | 插件在本机使用的"端口号"（可理解为对讲频道）。只有 8401 被别的程序占用时才需要改 |
+| `autoStart` | 开启 | 每次打开 VS Code 时自动启动代理 |
+| `nodePath` | 空 | 指定 Node.js 的位置；留空让插件自己找 |
+| `codexConfigPath` | 空 | 指定 Codex 配置文件的位置；留空使用默认位置 |
+| `creditsRefreshSeconds` | 60 | 积分自动刷新的间隔秒数（最少 15 秒） |
+| `proxyPath` | 空 | 高级选项：指定代理程序的位置；留空使用插件自带的 |
 
-## 写入的 Codex 配置
+## 遇到问题怎么办
 
-```toml
-model = "<所选模型>"
-model_provider = "workbuddy2codex"
-model_catalog_json = "workbuddy2codex-catalog.json"
-
-[model_providers.workbuddy2codex]
-name = "WorkBuddy (local proxy)"
-base_url = "http://127.0.0.1:8401/v1"
-wire_api = "responses"
-requires_openai_auth = false
-experimental_bearer_token = "local"
-```
-
-`config.toml` 与 catalog 一律以 **UTF-8 无 BOM** 写入（Codex 遇到 BOM 会解析失败）。
-写入是幂等的：重复执行不会产生重复段。`移除 Codex 配置` 会删掉该段并还原
-你原来的 `model` / `model_provider` / `model_catalog_json`。
-
-## 剩余积分
-
-面板与状态栏显示的是 `POST /v2/billing/meter/get-user-resource` 的只读汇总：
-
-- 月度包看 `CycleCapacityRemain`，一次性包看 `CapacityRemain`，过期或耗尽的
-  一次性包不计入
-- 企业账号走 `get-enterprise-user-usage`（`limitNum - credit`）
-- 该接口不消耗积分
-
-默认每 60 秒刷新，可用 `workbuddy2codex.creditsRefreshSeconds` 调整。
-
-## 项目结构
-
-```
-workbuddy2codex/
-├─ src/                      VS Code 扩展主体
-│  ├─ extension.js           激活、命令、状态栏
-│  ├─ controller.js          代理生命周期与状态聚合
-│  ├─ proxy-process.js       子进程启动 / 停止
-│  ├─ proxy-client.js        本地 HTTP 客户端
-│  ├─ codex-config.js        config.toml 幂等写入与回滚
-│  ├─ paths.js / node-locator.js / webview-html.js
-│  └─ panel.js               Webview 视图提供者
-├─ media/                    面板样式与脚本、活动栏图标
-├─ proxy/                    代理运行时（扩展内置，随包分发）
-│  ├─ proxy.mjs              Responses ↔ chat completions 双向翻译
-│  └─ shared/                凭据、积分、模型目录
-├─ dev/                      本地自检脚本
-└─ package.json              扩展清单
-```
-
-代理只监听 `127.0.0.1`，由扩展按需拉起与停止，没有独立的命令行入口，
-也没有开机自启、看门狗或第三方切换器集成。
-
-## 开发自检
-
-```powershell
-npm run check      # 语法检查（扩展入口 + 代理）
-npm run smoke      # 无 VS Code 环境下验证激活、命令注册与配置写入
-npm run prepackage # 校验清单引用的文件都在仓库里
-```
-
-`smoke` 与 `prepackage` 会把 Codex 配置写到临时目录，不会改动你真实的
-`~/.codex/config.toml`。
-
-## 故障排查
-
-| 现象 | 处理 |
+| 现象 | 建议处理 |
 |---|---|
-| 面板提示「找不到 proxy/proxy.mjs」 | 确认 `proxy/proxy.mjs` 存在，或设置 `workbuddy2codex.proxyPath` |
-| 启动失败、日志为空 | 检查 `workbuddy2codex.nodePath`；VS Code 自带的 Electron 运行时也能兜底 |
-| 401 / 刷新失败 | 打开 WorkBuddy 桌面端点一次「登录」；扩展会重新读取凭据 |
-| 402 / 积分不足 | 面板积分见底，需在 WorkBuddy 侧充值 |
-| 429 | 上游限流，稍后重试 |
-| Codex 里看不到模型 | 确认已点「写入 Codex」，并**新开** Codex 会话 |
-| 端口被占 | 日志出现 `port 8401 already in use` 时换一个 `workbuddy2codex.port`，或结束占用进程 |
-| 面板先显示运行、几十秒后又变未启动 | 旧版本遗留的代理进程占着端口且 pid 文件不匹配；现已自动识别端口真实监听者并修复 pid 记录 |
+| 面板显示「端口 8401 被其他进程占用」 | 说明有别的程序占着这个频道。把 `port` 改成 8402 之类的其他数字，或关掉占用它的程序后重启 VS Code |
+| 面板先显示运行、过一会儿又变「未启动」 | 旧版本残留的代理进程导致的，1.0.1 已修复：会自动识别端口上真正的代理并修正记录。若仍出现，点一次「重启代理」 |
+| 提示「找不到 proxy/proxy.mjs」 | 安装包不完整，重新安装一次 `.vsix` |
+| 启动失败，日志里写 `already in use` | 同上，改端口或结束占用程序 |
+| 提示登录失效 / 401 | 打开 WorkBuddy 桌面端，重新登录一次，再点「重启代理」 |
+| 提示积分不足 / 402 | WorkBuddy 侧积分用完了，需要充值 |
+| 提示 429 | WorkBuddy 服务器限流，等一会儿再试 |
+| Codex 里看不到模型 | 确认点过「写入 Codex」，并且**新开**了 Codex 会话 |
+| 启动很慢 | 首次读取登录信息、拉取模型列表需要时间；之后再启动会快很多 |
 
-日志位置：`~\.workbuddy2codex\proxy-<port>.log`（面板底部也会显示末尾几行）。
+出问题时先展开面板底部的「日志」看最后几行，那里已经把关键信息显示出来了。
+如果想看完整日志，打开个人目录下的 `.workbuddy2codex` 文件夹：
+
+- Windows：`C:\Users\<你的用户名>\.workbuddy2codex\`
+- macOS：`/Users/<你的用户名>/.workbuddy2codex/`
+
+其中的 `proxy-8401.log` 就是代理日志（端口改成别的则是 `proxy-<端口>.log`）。
 
 ## 已知限制
 
-- 只监听 `127.0.0.1`，不对局域网开放
-- 代理进程崩溃后不会自动重启，需要手动重启
-- 上游按积分计费，倍率随模型不同
-- 依赖非官方接口，上游协议变更即可能失效
-- 支持的模型目录来自上游实时拉取，失败时回落到内置表
+- 只在你自己电脑上工作（本地 127.0.0.1），不对局域网/外网开放。
+- 代理进程意外退出后不会自动重启，需要点一次「重启代理」。
+- 每次调用都会消耗你 WorkBuddy 账号的积分，不同模型倍率不同。
+- 依赖 WorkBuddy 的非官方接口，WorkBuddy 改版后可能暂时不可用。
+- 模型列表实时来自 WorkBuddy，拉取失败时使用内置的备用列表。
 
 ## 法律与合规提示
 
@@ -185,5 +154,9 @@ npm run prepackage # 校验清单引用的文件都在仓库里
 原创部分：MIT，© 2026 Black Yuan，详见 `LICENSE`。
 
 `proxy/` 中有部分实现移植自 MIT 许可的 `dsh-workbuddy-connect`，
-其署名与许可原文见 `THIRD-PARTY-NOTICES.md`，
-分发时必须保留。
+其署名与许可原文见 `THIRD-PARTY-NOTICES.md`，分发时必须保留。
+
+## 给开发者
+
+架构、模块职责、协议翻译、凭据与配置写入等实现细节，全部集中在插件自带的
+`Developer.md` 里（与 `README.md` 同一目录）。
