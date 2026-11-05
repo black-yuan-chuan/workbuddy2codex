@@ -1,0 +1,17 @@
+# Runtime artifacts and real data - never commit these.
+capture/
+*.log
+*.log.err
+*.err.log
+*.pid
+proxy-events.log
+*.bak
+*.bak-*
+auth.json
+*.info
+node_modules/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.vsix

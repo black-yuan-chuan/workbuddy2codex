@@ -1,0 +1,168 @@
+{
+  "name": "workbuddy2codex",
+  "displayName": "WorkBuddy2Codex",
+  "description": "在 VS Code 内一键启停 WorkBuddy 本地代理，切换模型并实时查看剩余积分",
+  "version": "1.0.0",
+  "publisher": "black-yuan",
+  "author": {
+    "name": "Black Yuan"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "workbuddy",
+    "codex",
+    "proxy",
+    "openai",
+    "responses"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "workbuddy2codex",
+          "title": "WorkBuddy2Codex",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "workbuddy2codex": [
+        {
+          "id": "workbuddy2codex.panel",
+          "name": "代理面板",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "workbuddy2codex.start",
+        "title": "启动代理",
+        "category": "WorkBuddy2Codex",
+        "icon": "$(play)"
+      },
+      {
+        "command": "workbuddy2codex.stop",
+        "title": "停止代理",
+        "category": "WorkBuddy2Codex",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "workbuddy2codex.restart",
+        "title": "重启代理",
+        "category": "WorkBuddy2Codex",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "workbuddy2codex.selectModel",
+        "title": "切换模型",
+        "category": "WorkBuddy2Codex",
+        "icon": "$(symbol-enum)"
+      },
+      {
+        "command": "workbuddy2codex.refreshCredits",
+        "title": "刷新剩余积分",
+        "category": "WorkBuddy2Codex",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "workbuddy2codex.syncCodexConfig",
+        "title": "写入 Codex 配置",
+        "category": "WorkBuddy2Codex"
+      },
+      {
+        "command": "workbuddy2codex.removeCodexConfig",
+        "title": "移除 Codex 配置",
+        "category": "WorkBuddy2Codex"
+      },
+      {
+        "command": "workbuddy2codex.openCodexConfig",
+        "title": "打开 Codex 配置文件",
+        "category": "WorkBuddy2Codex"
+      },
+      {
+        "command": "workbuddy2codex.showPanel",
+        "title": "打开面板",
+        "category": "WorkBuddy2Codex"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "workbuddy2codex.start",
+          "when": "view == workbuddy2codex.panel",
+          "group": "navigation@1"
+        },
+        {
+          "command": "workbuddy2codex.stop",
+          "when": "view == workbuddy2codex.panel",
+          "group": "navigation@2"
+        },
+        {
+          "command": "workbuddy2codex.selectModel",
+          "when": "view == workbuddy2codex.panel",
+          "group": "navigation@3"
+        },
+        {
+          "command": "workbuddy2codex.refreshCredits",
+          "when": "view == workbuddy2codex.panel",
+          "group": "navigation@4"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "WorkBuddy2Codex",
+      "properties": {
+        "workbuddy2codex.port": {
+          "type": "number",
+          "default": 8401,
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "本地代理监听端口（Codex 的 base_url 使用该端口）。"
+        },
+        "workbuddy2codex.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "VS Code 启动时自动拉起本地代理。"
+        },
+        "workbuddy2codex.nodePath": {
+          "type": "string",
+          "default": "",
+          "description": "node 可执行文件路径；留空使用 PATH 中的 node。"
+        },
+        "workbuddy2codex.codexConfigPath": {
+          "type": "string",
+          "default": "",
+          "description": "Codex 的 config.toml 路径；留空使用 ~/.codex/config.toml。"
+        },
+        "workbuddy2codex.creditsRefreshSeconds": {
+          "type": "number",
+          "default": 60,
+          "minimum": 15,
+          "description": "剩余积分自动刷新间隔（秒）。"
+        },
+        "workbuddy2codex.proxyPath": {
+          "type": "string",
+          "default": "",
+          "description": "高级：自定义代理脚本路径；留空使用扩展内置的 proxy/proxy.mjs。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "check": "node --check src/extension.js && node --check proxy/proxy.mjs",
+    "smoke": "node dev/smoke.cjs",
+    "prepackage": "node dev/check-package.mjs",
+    "vscode:prepublish": "node dev/check-package.mjs"
+  }
+}

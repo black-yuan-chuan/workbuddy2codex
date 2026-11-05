@@ -1,0 +1,41 @@
+MIT License
+
+Copyright (c) 2026 Black Yuan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+# Scope / 适用范围
+
+This MIT license covers **the original parts of this repository**: the VS Code
+extension (`src/`, `media/`) and the local proxy runtime
+(`proxy/`) as published here.
+
+本 MIT 许可覆盖**本仓库的原创部分**：VS Code 扩展（`src/`、`media/`）
+与本地代理运行时（`proxy/`）。
+
+Third-party material is **not** covered by this license. This repository contains
+no third-party project files, but parts of `proxy/` are ported from MIT-licensed
+work. Those attributions are recorded in `THIRD-PARTY-NOTICES.md` and must be
+retained when redistributing.
+
+第三方内容不在此许可范围内。本仓库不包含任何第三方项目的文件本体，但
+`proxy/` 的部分实现移植自 MIT 许可的项目，相关归属与许可原文见
+`THIRD-PARTY-NOTICES.md`，分发时必须随附保留。
