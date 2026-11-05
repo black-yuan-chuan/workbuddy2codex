@@ -8,6 +8,14 @@
     "name": "Black Yuan"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/black-yuan-chuan/workbuddy2codex.git"
+  },
+  "bugs": {
+    "url": "https://github.com/black-yuan-chuan/workbuddy2codex/issues"
+  },
+  "homepage": "https://github.com/black-yuan-chuan/workbuddy2codex#readme",
   "engines": {
     "vscode": "^1.85.0"
   },

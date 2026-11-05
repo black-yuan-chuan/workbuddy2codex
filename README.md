@@ -158,5 +158,5 @@ code --install-extension F:\workbuddy2codex\workbuddy2codex-1.0.1.vsix --force
 
 ## 给开发者
 
-架构、模块职责、协议翻译、凭据与配置写入等实现细节，全部集中在插件自带的
-`Developer.md` 里（与 `README.md` 同一目录）。
+架构、模块职责、协议翻译、凭据与配置写入等实现细节，全部在
+[`Developer.md`](Developer.md)。
