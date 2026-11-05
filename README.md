@@ -34,7 +34,7 @@ VS Code 侧边栏  ──启动/停止──▶  proxy/proxy.mjs  ──▶  Wor
 
 ```powershell
 npx @vscode/vsce package --no-dependencies
-code --install-extension workbuddy2codex-1.0.0.vsix
+code --install-extension workbuddy2codex-1.0.1.vsix
 ```
 
 ### 从源码调试
@@ -159,7 +159,8 @@ npm run prepackage # 校验清单引用的文件都在仓库里
 | 402 / 积分不足 | 面板积分见底，需在 WorkBuddy 侧充值 |
 | 429 | 上游限流，稍后重试 |
 | Codex 里看不到模型 | 确认已点「写入 Codex」，并**新开** Codex 会话 |
-| 端口被占 | 换一个 `workbuddy2codex.port`；插件只接管自己拉起的进程 |
+| 端口被占 | 日志出现 `port 8401 already in use` 时换一个 `workbuddy2codex.port`，或结束占用进程 |
+| 面板先显示运行、几十秒后又变未启动 | 旧版本遗留的代理进程占着端口且 pid 文件不匹配；现已自动识别端口真实监听者并修复 pid 记录 |
 
 日志位置：`~\.workbuddy2codex\proxy-<port>.log`（面板底部也会显示末尾几行）。
 

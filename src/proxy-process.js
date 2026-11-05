@@ -7,20 +7,26 @@ const { locateNode } = require("./node-locator");
 
 const isWindows = process.platform === "win32";
 
-/** 通过 pid 文件识别仍在运行的本插件代理。 */
-function readPid(port) {
+/** 进程是否还活着（signal 0 只做存在性探测）。 */
+function isAlive(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
   try {
-    const raw = fs.readFileSync(pidFile(port), "utf8").trim();
-    const pid = Number.parseInt(raw, 10);
-    if (!Number.isInteger(pid) || pid <= 0) return null;
     process.kill(pid, 0);
-    // pid 可能被系统复用：只认命令行里确实跑着 proxy.mjs 的进程。
-    return isProxyProcess(pid) ? pid : null;
+    return true;
   } catch {
-    return null;
+    return false;
   }
 }
 
+/** 命令行里是否有以 proxy.mjs 结尾的参数（旧版本装在不同目录下也算）。 */
+function isProxyCommand(command) {
+  if (!command) return false;
+  return String(command)
+    .split(/["'\s]+/)
+    .some((token) => /[\\/]proxy\.mjs$/i.test(token));
+}
+
+/** 读出进程命令行；进程不存在或读取失败时返回空串。 */
 function commandLineOf(pid) {
   if (!isWindows) {
     try {
@@ -41,7 +47,77 @@ function commandLineOf(pid) {
 }
 
 function isProxyProcess(pid) {
-  return /proxy\.mjs/i.test(commandLineOf(pid));
+  return isProxyCommand(commandLineOf(pid));
+}
+
+function windowsPortOwner(port) {
+  const script =
+    `Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction SilentlyContinue ` +
+    "| Select-Object -First 1 -ExpandProperty OwningProcess";
+  const out = execFileSync("powershell", ["-NoProfile", "-Command", script], {
+    encoding: "utf8",
+    timeout: 5000,
+    windowsHide: true,
+  });
+  return Number.parseInt(String(out).trim(), 10) || null;
+}
+
+function unixPortOwner(port) {
+  try {
+    const out = execFileSync("lsof", ["-ti", `tcp:${port}`, "-sTCP:LISTEN"], {
+      encoding: "utf8",
+      timeout: 5000,
+    });
+    return Number.parseInt(String(out).split(/\s+/).filter(Boolean)[0], 10) || null;
+  } catch {
+    return null;
+  }
+}
+
+/** 端口监听者 pid；端口空闲时返回 null。 */
+function portOwnerPid(port) {
+  try {
+    return isWindows ? windowsPortOwner(port) : unixPortOwner(port);
+  } catch {
+    return null;
+  }
+}
+
+/** 端口占用者信息：{ pid, command }；端口空闲返回 null。 */
+function portOwner(port) {
+  const pid = portOwnerPid(port);
+  if (!pid) return null;
+  return { pid, command: commandLineOf(pid).trim() };
+}
+
+/** pid 文件里登记且确实还在跑的代理。 */
+function recordedPid(port) {
+  try {
+    const pid = Number.parseInt(fs.readFileSync(pidFile(port), "utf8").trim(), 10);
+    if (!isAlive(pid) || !isProxyProcess(pid)) return null;
+    return pid;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 识别本插件的代理进程。
+ *
+ * 优先信任 pid 文件；pid 文件缺失或指向已退出的进程时（旧版本遗留、
+ * 手工 kill 后重启 VS Code 等），退化为检查端口真实监听者的命令行，
+ * 认出来就顺手把 pid 文件修正过来，避免“代理在跑但插件说没跑”。
+ */
+function readPid(port) {
+  const recorded = recordedPid(port);
+  if (recorded) return recorded;
+  const owner = portOwner(port);
+  if (!owner || !isProxyCommand(owner.command)) return null;
+  try {
+    ensureStateDir();
+    fs.writeFileSync(pidFile(port), String(owner.pid), "utf8");
+  } catch {}
+  return owner.pid;
 }
 
 function clearPid(port) {
@@ -94,10 +170,13 @@ function spawnProxy(options) {
 /** 停止代理：结束整个进程树并清掉 pid 记录。 */
 function stopProxy(port) {
   const pid = readPid(port);
-  if (!pid) return { stopped: false, reason: "not-running" };
+  if (!pid) {
+    clearPid(port);
+    return { stopped: false, reason: "not-running" };
+  }
   const ok = killTree(pid);
   clearPid(port);
   return { stopped: ok, pid };
 }
 
-module.exports = { readPid, clearPid, spawnProxy, stopProxy };
+module.exports = { isAlive, isProxyCommand, readPid, clearPid, portOwner, spawnProxy, stopProxy };

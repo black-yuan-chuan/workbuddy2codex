@@ -673,6 +673,7 @@ const server = createServer(async (req, res) => {
         ok: true,
         service: "workbuddy2codex",
         port: PORT,
+        pid: process.pid,
         endpoints: ["/v1/responses", "/v1/chat/completions", "/v1/models", "/v1/credits", "/w2c/models", "/w2c/catalog"],
       });
       return;
@@ -836,6 +837,15 @@ const server = createServer(async (req, res) => {
 });
 
 server.requestTimeout = 0;
+server.on("error", (err) => {
+  // Fail loudly but legibly: the extension reads this line from the log file.
+  const reason = err && err.code === "EADDRINUSE"
+    ? `port ${PORT} already in use; stop the other process or change workbuddy2codex.port`
+    : String((err && err.message) || err);
+  console.error(`[workbuddy2codex] failed to start: ${reason}`);
+  process.exit(1);
+});
+
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`[workbuddy2codex] listening on http://127.0.0.1:${PORT}`);
   console.log(`[workbuddy2codex] auth file: ${authFilePath()}`);
